@@ -50,12 +50,13 @@ function stopTone(note, callback, duration) {
     if (duration) {
       osc.stop(ac.currentTime + duration);
     } else {
-      osc.stop(ac.currentTime + 0.5)
+      osc.stop(ac.currentTime + 0.5) //This shouldn't happen when using keyup, only on click
     }
     aBoolObjects[note] = true;
     let lengthSecNote = ac.currentTime - osc.starter // note duration
-    console.log(lengthSecNote)
-    noteRecorder(note, lengthSecNote) //saves note on Recording Variable
+    let timeIn = osc.starter - recordingStart
+    console.log(timeIn)
+    noteRecorder(note, lengthSecNote, timeIn) //saves note on Recording Variable
     createNote(note)
     if (callback) {osc.onended = function() {
         Array.from( document.getElementsByClassName('note')).forEach(element => element.style="")
@@ -107,21 +108,23 @@ document.addEventListener('click',
 )
 
 let recording = false
+let recordingStart
 const newRecording = []
 
 //RECORDING FUNCTIONALITY
 document.getElementById('record').addEventListener('click',
   function(event) {
       recording = !recording
+      recordingStart = ac.currentTime
       console.log(recording)
   }
 )
 
-function noteRecorder(note, duration) {
+function noteRecorder(note, duration, timeIn) {
     if (recording === false) {
         return
     } else {
-        let newNote = new Note(note, Math.random()*2)
+        let newNote = new Note(note, duration, timeIn)
         newRecording.push(newNote)
     }
 }
